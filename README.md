@@ -19,8 +19,13 @@ boilerplate project using yew + actix-web + graphql + mongodb
 * [MongoDB](https://www.mongodb.org.cn/) - MongoDB是一个介于关系数据库和非关系数据库(nosql)之间的产品，是非关系数据库当中功能最丰富，最像关系数据库的。
 
 
-
 # How to
+
+### How to install MongoDB on Mac
+```
+$ brew install mongodb-community@4.0
+$ mongod --dbpath .
+```
 ### How to build
 ```
 $ cargo build
@@ -42,3 +47,13 @@ trunk serve
 ```
 visit http://localhost:3000/
 
+
+## Referrence Links
+### Yew
+* https://yew.rs/zh-CN/docs/getting-started/build-a-sample-app
+
+### Actix-web
+* https://actix.rs/docs/getting-started/
+
+### Actix-web + MongoDB
+* https://github.com/actix/examples/tree/master/databases/mongodb

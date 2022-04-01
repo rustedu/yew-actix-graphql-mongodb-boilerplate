@@ -5,7 +5,10 @@ edition = "2021"
 
 [[bin]]
 name = "server"
-path = "main.rs"
+#path = "main.rs"
+path = "main-mongo.rs"
 
 [dependencies]
 actix-web = "4"
+mongodb = "2.0.0"
+serde = { version = "1.0", features = ["derive"] }
