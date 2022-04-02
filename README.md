@@ -42,8 +42,7 @@ visit http://localhost:8080/
 ```
 cargo install trunk
 
-cd client
-trunk serve
+cd client && trunk serve
 ```
 visit http://localhost:3000/
 
@@ -57,3 +56,10 @@ visit http://localhost:3000/
 
 ### Actix-web + MongoDB
 * https://github.com/actix/examples/tree/master/databases/mongodb
+
+### Actix-web + GraphQL + MongoDB
+* https://github.com/liamdebellada/Rust-Actix-GraphQL-MongoDB
+* https://github.com/shareeff/rust_graphql_mongodb
+
+### Yew + Todos
+* https://github.com/yewstack/yew/tree/master/examples/todomvc
