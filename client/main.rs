@@ -11,6 +11,11 @@ use yew::{
 };
 
 mod state;
+mod utils;
+mod types;
+mod services;
+
+use crate::services::todos;
 
 const KEY: &str = "yew.todomvc.self";
 
@@ -24,6 +29,7 @@ pub enum Msg {
     Toggle(usize),
     ClearCompleted,
     Focus,
+    InitialEntries
 }
 
 pub struct App {
@@ -36,7 +42,18 @@ impl Component for App {
     type Properties = ();
 
     fn create(_ctx: &Context<Self>) -> Self {
-        let entries = LocalStorage::get(KEY).unwrap_or_else(|_| Vec::new());
+        // let mut entries = LocalStorage::get(KEY).unwrap_or_else(|_| Vec::new());
+        let mut entries: Vec<Entry> = vec![];
+        wasm_bindgen_futures::spawn_local(async move {
+            let todos_list = todos::all().await;
+            log::info!("fetch videos: {:#?}", todos_list);
+            if let Some(todos_list) = &todos_list.ok() {
+                log::info!("fetch videos: {:#?}", todos_list.todos);
+                // how to notify component to update state with new todos list
+                // _ctx.link().callback(|_| Msg::InitialEntries);
+            }
+        });
+
         let state = State {
             entries,
             filter: Filter::All,
@@ -48,9 +65,13 @@ impl Component for App {
 
     fn update(&mut self, _ctx: &Context<Self>, msg: Self::Message) -> bool {
         match msg {
+            Msg::InitialEntries => {
+                log::info!("InitialEntries");
+            },
             Msg::Add(description) => {
                 if !description.is_empty() {
                     let entry = Entry {
+                        id: "10".to_string(),
                         description: description.trim().to_string(),
                         completed: false,
                         editing: false,
@@ -245,6 +266,7 @@ impl App {
 }
 
 fn main() {
+    wasm_logger::init(wasm_logger::Config::default());
     yew::start_app::<App>();
 }
 

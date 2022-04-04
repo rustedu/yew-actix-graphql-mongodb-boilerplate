@@ -110,8 +110,10 @@ impl State {
     }
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq)]
+#[serde(rename_all = "camelCase")]
 pub struct Entry {
+    pub id: String,
     pub description: String,
     pub completed: bool,
     pub editing: bool,
