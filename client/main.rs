@@ -10,6 +10,11 @@ use yew::{
     Classes, Component, Context, Html, NodeRef, TargetCast,
 };
 
+extern crate dotenv;
+
+use dotenv::dotenv;
+
+
 mod state;
 mod utils;
 mod types;
@@ -46,9 +51,8 @@ impl Component for App {
         let mut entries: Vec<Entry> = vec![];
         wasm_bindgen_futures::spawn_local(async move {
             let todos_list = todos::all().await;
-            log::info!("fetch videos: {:#?}", todos_list);
             if let Some(todos_list) = &todos_list.ok() {
-                log::info!("fetch videos: {:#?}", todos_list.todos);
+                log::info!("fetch todos: {:#?}", todos_list.todos);
                 // how to notify component to update state with new todos list
                 // _ctx.link().callback(|_| Msg::InitialEntries);
             }
@@ -266,6 +270,7 @@ impl App {
 }
 
 fn main() {
+    dotenv().ok();
     wasm_logger::init(wasm_logger::Config::default());
     yew::start_app::<App>();
 }

@@ -1,7 +1,8 @@
+use dotenv_codegen::dotenv;
 use serde::{de::DeserializeOwned, Serialize};
-
 use crate::types::{ErrorInfo, Error};
 
+const API_ROOT: &str = dotenv!("API_ROOT");
 
 /// build all kinds of http request: post/get/delete etc.
 pub async fn request<B, T>(method: reqwest::Method, url: String, body: B) -> Result<T, Error>
@@ -10,9 +11,7 @@ where
     B: Serialize + std::fmt::Debug,
 {
     let allow_body = method == reqwest::Method::POST || method == reqwest::Method::PUT;
-    let api_root = "https://my-json-server.typicode.com/july-12/demo";
-    // let api_root = "https://jsonplaceholder.typicode.com";
-    let url = format!("{}{}", api_root, url);
+    let url = format!("{}{}", API_ROOT, url);
     log::info!("{}{}", method, url);
     let mut builder = reqwest::Client::new()
         .request(method, url)
@@ -30,8 +29,6 @@ where
     if let Ok(data) = response {
         if data.status().is_success() {
             let data: Result<T, _> = data.json::<T>().await;
-            
-                log::debug!("Response: {:?}", data);
             if let Ok(data) = data {
                 log::debug!("Response: {:?}", data);
                 Ok(data)
