@@ -34,7 +34,7 @@ pub enum Msg {
     Toggle(usize),
     ClearCompleted,
     Focus,
-    InitialEntries
+    InitialEntries(Vec<Entry>)
 }
 
 pub struct App {
@@ -48,16 +48,7 @@ impl Component for App {
 
     fn create(_ctx: &Context<Self>) -> Self {
         // let mut entries = LocalStorage::get(KEY).unwrap_or_else(|_| Vec::new());
-        let mut entries: Vec<Entry> = vec![];
-        wasm_bindgen_futures::spawn_local(async move {
-            let todos_list = todos::all().await;
-            if let Some(todos_list) = &todos_list.ok() {
-                log::info!("fetch todos: {:#?}", todos_list.todos);
-                // how to notify component to update state with new todos list
-                // _ctx.link().callback(|_| Msg::InitialEntries);
-            }
-        });
-
+        let entries: Vec<Entry> = vec![];
         let state = State {
             entries,
             filter: Filter::All,
@@ -67,10 +58,24 @@ impl Component for App {
         Self { state, focus_ref }
     }
 
+    fn rendered(&mut self, ctx: &Context<Self>, first_render: bool) {
+        if first_render {
+            let link = ctx.link().clone();
+            let fetch_todos =  async move {
+                let link = link.clone();
+                let todos_list = todos::all().await;
+                if let Some(todos_list) = &todos_list.ok() {
+                    link.send_message(Msg::InitialEntries(todos_list.todos.clone()));
+                }
+            };
+            wasm_bindgen_futures::spawn_local(fetch_todos );
+        }
+    }
+
     fn update(&mut self, _ctx: &Context<Self>, msg: Self::Message) -> bool {
         match msg {
-            Msg::InitialEntries => {
-                log::info!("InitialEntries");
+            Msg::InitialEntries(entries) => {
+                self.state.entries = entries
             },
             Msg::Add(description) => {
                 if !description.is_empty() {
