@@ -20,6 +20,8 @@ mod utils;
 mod types;
 mod services;
 
+
+use crate::types::{ TodoCreateUpdateInfoWrapper, TodoCreateUpdateInfo };
 use crate::services::todos;
 
 const KEY: &str = "yew.todomvc.self";
@@ -34,7 +36,8 @@ pub enum Msg {
     Toggle(usize),
     ClearCompleted,
     Focus,
-    InitialEntries(Vec<Entry>)
+    InitialEntries(Vec<Entry>),
+    UpdateTodo
 }
 
 pub struct App {
@@ -62,9 +65,11 @@ impl Component for App {
         if first_render {
             let link = ctx.link().clone();
             let fetch_todos =  async move {
+                log::info!("goes hre");
                 let link = link.clone();
                 let todos_list = todos::all().await;
                 if let Some(todos_list) = &todos_list.ok() {
+                    log::info!("{:?}", todos_list);
                     link.send_message(Msg::InitialEntries(todos_list.todos.clone()));
                 }
             };
@@ -77,10 +82,22 @@ impl Component for App {
             Msg::InitialEntries(entries) => {
                 self.state.entries = entries
             },
+            Msg::UpdateTodo => {
+                let first_todo = self.state.entries.get(2).unwrap();
+                log::info!("{:?}", first_todo);
+
+                let first_todo = first_todo.clone();
+            let update_todos =  async move {
+                let first_todo = first_todo.clone();
+                todos::update(first_todo.id.to_string(), TodoCreateUpdateInfoWrapper { todo: TodoCreateUpdateInfo { description: first_todo.description.clone() } }).await;
+            };
+            wasm_bindgen_futures::spawn_local( update_todos );
+
+            },
             Msg::Add(description) => {
                 if !description.is_empty() {
                     let entry = Entry {
-                        id: "10".to_string(),
+                        id: 10,
                         description: description.trim().to_string(),
                         completed: false,
                         editing: false,
@@ -129,7 +146,7 @@ impl Component for App {
         } else {
             ""
         };
-        html! {
+        let ii = html! {
             <div class="todomvc-wrapper">
                 <section class="todoapp">
                     <header class="header">
@@ -168,6 +185,10 @@ impl Component for App {
                     <p>{ "Part of " }<a href="http://todomvc.com/" target="_blank">{ "TodoMVC" }</a></p>
                 </footer>
             </div>
+        };
+        html! {
+            <div onclick={ctx.link().callback(|_| Msg::UpdateTodo)}> { "click "} </div>
+
         }
     }
 }
