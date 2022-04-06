@@ -7,3 +7,11 @@ pub struct User {
     pub username: String,
     pub email: String,
 }
+
+#[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
+pub struct Todo {
+    pub id : String,
+    pub description : String,
+    pub completed : bool,
+    pub editing : bool,
+}

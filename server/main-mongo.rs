@@ -8,6 +8,7 @@ use actix_web::{get, post, web, App, HttpResponse, HttpServer};
 use mongodb::{bson::doc, options::IndexOptions, Client, Collection, IndexModel};
 
 use model::User;
+use model::Todo;
 
 const DB_NAME: &str = "myApp";
 const COLL_NAME: &str = "users";
@@ -36,6 +37,42 @@ async fn get_user(client: web::Data<Client>, username: web::Path<String>) -> Htt
         Ok(None) => {
             HttpResponse::NotFound().body(format!("No user found with username {}", username))
         }
+        Err(err) => HttpResponse::InternalServerError().body(err.to_string()),
+    }
+}
+
+#[get("/todos")]
+async fn get_todos(client: web::Data<Client>) -> HttpResponse {
+    let collection: Collection<Todo> = client.database(DB_NAME).collection("todos");
+    let todos = vec![
+        Todo {
+            id : "1".to_string(),
+            description : "READ".to_string(),
+            completed : false,
+            editing : false
+            },
+        Todo {
+            id : "2".to_string(),
+            description : "COOK".to_string(),
+            completed : false,
+            editing : false
+            },
+        Todo {
+            id : "3".to_string(),
+            description : "CODING".to_string(),
+            completed : false,
+            editing : false
+            },
+    ];
+    match collection
+        .find(None, None)
+        .await
+    {
+        // To-be-fixed
+        Ok(_) => HttpResponse::Ok().json(todos),
+        // Ok(None) => {
+        //     HttpResponse::NotFound().body(format!("No record found"))
+        // }
         Err(err) => HttpResponse::InternalServerError().body(err.to_string()),
     }
 }
@@ -69,6 +106,7 @@ async fn main() -> std::io::Result<()> {
             .app_data(web::Data::new(client.clone()))
             .service(add_user)
             .service(get_user)
+            .service(get_todos)
     })
     .bind(("127.0.0.1", 8080))?
     .run()

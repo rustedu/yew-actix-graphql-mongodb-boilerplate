@@ -27,7 +27,25 @@ boilerplate project using yew + actix-web + graphql + mongodb
 ### How to install MongoDB on Mac
 ```
 $ brew install mongodb-community@4.0
-$ mongod --dbpath .
+$ mkdir -p /tmp/db
+$ mongod --dbpath /tmp/db
+$ Add a db named "myApp"
+$ Add a collection named "users" to "myApp"
+$ Add a record to users documents
+{
+  first_name: "Jane",
+  last_name: "Doe",
+  username: "janedoe",
+  email: "example@example.com",
+}
+$ Add a collection named "todos" to "myApp"
+$ Add a record to todos documents
+{
+  "id" : "1",
+  "description" : "COOK",
+  "completed" : false,
+  "editing" : false
+}
 ```
 ### How to build
 ```
