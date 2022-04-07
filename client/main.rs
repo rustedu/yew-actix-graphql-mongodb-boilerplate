@@ -94,8 +94,20 @@ impl Component for App {
             },
             Msg::Add(description) => {
                 if !description.is_empty() {
+                    let mut entries = self.state.entries.clone();
+
+                    let mut new_id = 0;
+
+                    for e in entries {
+                        if e.id > new_id {
+                            new_id = e.id;
+                        }
+                    }
+
+                    new_id += 1;
+
                     let entry = Entry {
-                        id: 10,
+                        id: new_id,
                         description: description.trim().to_string(),
                         completed: false,
                         editing: false,
