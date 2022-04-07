@@ -94,6 +94,56 @@ async fn get_todos(client: web::Data<Client>) -> HttpResponse {
     }
 }
 
+
+#[post("/api/todos")]
+async fn set_todos(client: web::Data<Client>, data: web::Json<HashMap<String, Vec::<Todo>>>) -> HttpResponse {
+    println!("{:?}", data);
+    let todos = data.get("todos").unwrap();
+    let collection: Collection<Todo> = client.database(DB_NAME).collection("todos");
+    for todo in todos {
+        println!("{}", todo.id);
+
+        match collection
+            .find_one(doc! { "id": todo.id }, None)
+            .await
+        {
+            Ok(Some(_t)) => {
+                let id_filter = doc! {"id": todo.id};
+
+                let _r = collection.update_one(
+                                                                id_filter,
+                                                                doc! {
+                                                                    "$set": {
+                                                                        "completed": todo.completed,
+                                                                        "editing": todo.editing,
+                                                                        "description": &todo.description,
+                                                                    }
+                                                                },
+                                                                None
+                                                            )
+                                                            .await;
+                // collection.update_one(doc! { "id": todo.id }, todo, None);
+                // HttpResponse::Ok().json(user)
+            },
+            Ok(None) => {
+                let new_todo = Todo {
+                    id: todo.id,
+                    description: todo.description.to_string(),
+                    completed: todo.completed,
+                    editing: todo.editing
+                };
+                let _r = collection.insert_one(new_todo, None).await.expect("failed to add todo");
+            }
+            Err(err) => {
+                return HttpResponse::InternalServerError().body(err.to_string());
+            },
+        }
+
+    }
+
+    HttpResponse::Ok().body(format!("Ok"))
+}
+
 /// Creates an index on the "username" field to force the values to be unique.
 async fn create_username_index(client: &Client) {
     let options = IndexOptions::builder().unique(true).build();
@@ -135,6 +185,7 @@ async fn main() -> std::io::Result<()> {
             .service(add_user)
             .service(get_user)
             .service(get_todos)
+            .service(set_todos)
     })
     .bind(("127.0.0.1", 8080))?
     .run()
