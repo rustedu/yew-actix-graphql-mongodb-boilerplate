@@ -2,8 +2,16 @@ use crate::utils::{request_delete, request_get, request_post, request_put};
 use crate::types::*;
 
 /// Get all todos
-pub async fn all() -> Result<TodoListInfo, Error> {
+pub async fn get_all() -> Result<TodoListInfo, Error> {
     request_get::<TodoListInfo>(format!("/todos")).await
+    // request_get::<TodoListInfo>(format!("/todos?{}", limit(20, 0))).await
+}
+
+/// Set all todos
+pub async fn set_all(todos: TodoListInfo) -> Result<TodoListInfo, Error> {
+    // let mut body = HashMap::new();
+    // body.insert("todos".to_string(), todos);
+    request_post::<TodoListInfo, TodoListInfo>(format!("/todos"), todos).await
     // request_get::<TodoListInfo>(format!("/todos?{}", limit(20, 0))).await
 }
 

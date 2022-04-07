@@ -1,6 +1,7 @@
 use gloo::storage::{LocalStorage, Storage};
 use state::{Entry, Filter, State};
 use strum::IntoEnumIterator;
+use types::TodoListInfo;
 use web_sys::HtmlInputElement as InputElement;
 use yew::{
     classes,
@@ -67,7 +68,7 @@ impl Component for App {
             let link = ctx.link().clone();
             let fetch_todos =  async move {
                 let link = link.clone();
-                let todos_list = todos::all().await;
+                let todos_list = todos::get_all().await;
                 log::info!("todos_list: {:?}", todos_list);
                 if let Some(todos_list) = &todos_list.ok() {
                     link.send_message(Msg::InitialEntries(todos_list.todos.clone()));
@@ -134,6 +135,18 @@ impl Component for App {
             }
         }
         LocalStorage::set(KEY, &self.state.entries).expect("failed to set");
+        // post to /api/todos to update mongodb
+
+        let entries = self.state.entries.clone();
+        wasm_bindgen_futures::spawn_local(async move {
+
+            let info = TodoListInfo {
+                todos: entries,
+            };
+
+            let _r = todos::set_all(info).await;
+        });
+
         true
     }
 

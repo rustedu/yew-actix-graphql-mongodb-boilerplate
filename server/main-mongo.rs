@@ -100,6 +100,10 @@ async fn set_todos(client: web::Data<Client>, data: web::Json<HashMap<String, Ve
     println!("{:?}", data);
     let todos = data.get("todos").unwrap();
     let collection: Collection<Todo> = client.database(DB_NAME).collection("todos");
+
+    // always drop all records before insert
+    let _d = collection.drop(None).await;
+
     for todo in todos {
         println!("{}", todo.id);
 
