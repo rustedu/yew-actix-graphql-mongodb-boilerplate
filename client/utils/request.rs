@@ -3,6 +3,7 @@ use serde::{de::DeserializeOwned, Serialize};
 use crate::types::{ErrorInfo, Error};
 
 const API_PROXY: &str = dotenv!("BASE_PROXY");
+// const API_PROXY: &str = "http://localhost:8080/api";
 
 pub async fn request<B, T>(method: reqwasm::http::Method, url: String, body: B) -> Result<T, Error>
 where
@@ -27,7 +28,6 @@ where
         if data.ok() {
             let data: Result<T, _> = data.json::<T>().await;
             if let Ok(data) = data {
-                log::debug!("Response: {:?}", data);
                 Ok(data)
             } else {
                 Err(Error::DeserializeError)

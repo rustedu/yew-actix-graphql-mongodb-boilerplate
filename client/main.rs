@@ -62,11 +62,13 @@ impl Component for App {
     }
 
     fn rendered(&mut self, ctx: &Context<Self>, first_render: bool) {
+        log::info!("first_render: {:?}", first_render);
         if first_render {
             let link = ctx.link().clone();
             let fetch_todos =  async move {
                 let link = link.clone();
                 let todos_list = todos::all().await;
+                log::info!("todos_list: {:?}", todos_list);
                 if let Some(todos_list) = &todos_list.ok() {
                     link.send_message(Msg::InitialEntries(todos_list.todos.clone()));
                 }
@@ -78,6 +80,7 @@ impl Component for App {
     fn update(&mut self, _ctx: &Context<Self>, msg: Self::Message) -> bool {
         match msg {
             Msg::InitialEntries(entries) => {
+                log::info!("update: {:?}", entries);
                 self.state.entries = entries
             },
             Msg::RestApiTest => {

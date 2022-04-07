@@ -4,7 +4,10 @@ mod model;
 #[cfg(test)]
 mod test;
 
-use actix_web::{get, post, web, App, HttpResponse, HttpServer};
+use std::collections::HashMap;
+
+use actix_cors::Cors;
+use actix_web::{get, post, http, web, App, HttpResponse, HttpServer};
 use mongodb::{bson::doc, options::IndexOptions, Client, Collection, IndexModel};
 
 use model::User;
@@ -64,12 +67,14 @@ async fn get_todos(client: web::Data<Client>) -> HttpResponse {
             editing : false
             },
     ];
+    let mut res = HashMap::new();
+    res.insert(String::from("todos"), todos);
     match collection
         .find(None, None)
         .await
     {
         // To-be-fixed
-        Ok(_) => HttpResponse::Ok().json(todos),
+        Ok(_) => HttpResponse::Ok().json(res),
         // Ok(None) => {
         //     HttpResponse::NotFound().body(format!("No record found"))
         // }
@@ -102,8 +107,19 @@ async fn main() -> std::io::Result<()> {
 
     println!("Server is running at http://127.0.0.1:8080");
     HttpServer::new(move || {
+        let cors = Cors::default()
+              .allowed_origin("http://127.0.0.1:3000")
+            //   .allowed_origin_fn(|origin, _req_head| {
+            //       origin.as_bytes().ends_with(b".rust-lang.org")
+            //   })
+              .allowed_methods(vec!["GET", "POST"])
+              .allowed_headers(vec![http::header::AUTHORIZATION, http::header::ACCEPT])
+              .allowed_header(http::header::CONTENT_TYPE)
+              .max_age(3600);
+
         App::new()
             .app_data(web::Data::new(client.clone()))
+            .wrap(cors)
             .service(add_user)
             .service(get_user)
             .service(get_todos)

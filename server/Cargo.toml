@@ -12,3 +12,4 @@ path = "main-mongo.rs"
 actix-web = "4"
 mongodb = "2.0.0"
 serde = { version = "1.0", features = ["derive"] }
+actix-cors = "0.6.1"
