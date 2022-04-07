@@ -20,6 +20,8 @@ mod utils;
 mod types;
 mod services;
 
+
+use crate::types::{ TodoCreateUpdateInfoWrapper, TodoCreateUpdateInfo };
 use crate::services::todos;
 
 const KEY: &str = "yew.todomvc.self";
@@ -34,7 +36,8 @@ pub enum Msg {
     Toggle(usize),
     ClearCompleted,
     Focus,
-    InitialEntries(Vec<Entry>)
+    InitialEntries(Vec<Entry>),
+    RestApiTest
 }
 
 pub struct App {
@@ -77,10 +80,18 @@ impl Component for App {
             Msg::InitialEntries(entries) => {
                 self.state.entries = entries
             },
+            Msg::RestApiTest => {
+                let rest_todos =  async move {
+                    // todos::get("1".to_string()).await;
+                    // todos::update("1".to_string(), TodoCreateUpdateInfoWrapper { todo: TodoCreateUpdateInfo { description: "cooooooook".to_string() } }).await;
+                    // todos::del("5".to_string()).await;
+                };
+                wasm_bindgen_futures::spawn_local( rest_todos );
+            },
             Msg::Add(description) => {
                 if !description.is_empty() {
                     let entry = Entry {
-                        id: "10".to_string(),
+                        id: 10,
                         description: description.trim().to_string(),
                         completed: false,
                         editing: false,
