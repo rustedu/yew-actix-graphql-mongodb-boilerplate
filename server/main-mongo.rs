@@ -41,24 +41,24 @@ async fn get_user(client: web::Data<Client>, username: web::Path<String>) -> Htt
     }
 }
 
-#[get("/todos")]
+#[get("/api/todos")]
 async fn get_todos(client: web::Data<Client>) -> HttpResponse {
     let collection: Collection<Todo> = client.database(DB_NAME).collection("todos");
     let todos = vec![
         Todo {
-            id : "1".to_string(),
+            id : 1,
             description : "READ".to_string(),
             completed : false,
             editing : false
             },
         Todo {
-            id : "2".to_string(),
+            id : 2,
             description : "COOK".to_string(),
             completed : false,
             editing : false
             },
         Todo {
-            id : "3".to_string(),
+            id : 3,
             description : "CODING".to_string(),
             completed : false,
             editing : false

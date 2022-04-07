@@ -10,7 +10,7 @@ pub struct User {
 
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
 pub struct Todo {
-    pub id : String,
+    pub id : u32,
     pub description : String,
     pub completed : bool,
     pub editing : bool,
