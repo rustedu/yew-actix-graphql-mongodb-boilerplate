@@ -12,6 +12,7 @@ use mongodb::{bson::doc, options::IndexOptions, Client, Collection, IndexModel};
 
 use model::User;
 use model::Todo;
+use futures::stream::{StreamExt};
 
 const DB_NAME: &str = "myApp";
 const COLL_NAME: &str = "users";
@@ -47,34 +48,45 @@ async fn get_user(client: web::Data<Client>, username: web::Path<String>) -> Htt
 #[get("/api/todos")]
 async fn get_todos(client: web::Data<Client>) -> HttpResponse {
     let collection: Collection<Todo> = client.database(DB_NAME).collection("todos");
-    let todos = vec![
-        Todo {
-            id : 1,
-            description : "READ".to_string(),
-            completed : false,
-            editing : false
-            },
-        Todo {
-            id : 2,
-            description : "COOK".to_string(),
-            completed : false,
-            editing : false
-            },
-        Todo {
-            id : 3,
-            description : "CODING".to_string(),
-            completed : false,
-            editing : false
-            },
-    ];
-    let mut res = HashMap::new();
-    res.insert(String::from("todos"), todos);
+    // let todos = vec![
+    //     Todo {
+    //         id : 1,
+    //         description : "READ".to_string(),
+    //         completed : false,
+    //         editing : false
+    //         },
+    //     Todo {
+    //         id : 2,
+    //         description : "COOK".to_string(),
+    //         completed : false,
+    //         editing : false
+    //         },
+    //     Todo {
+    //         id : 3,
+    //         description : "CODING".to_string(),
+    //         completed : false,
+    //         editing : false
+    //         },
+    // ];
+    // let mut res = HashMap::new();
+    // res.insert(String::from("todos"), todos);
     match collection
         .find(None, None)
         .await
     {
         // To-be-fixed
-        Ok(_) => HttpResponse::Ok().json(res),
+        Ok(mut cursor) => {
+            let mut todos = Vec::new();
+            while let Some(doc) = cursor.next().await {
+                if let Ok(todo) = doc {
+                    todos.push(todo);
+                }
+            }
+            let mut res = HashMap::new();
+            res.insert(String::from("todos"), todos);
+
+            HttpResponse::Ok().json(res)
+        },
         // Ok(None) => {
         //     HttpResponse::NotFound().body(format!("No record found"))
         // }
