@@ -7,7 +7,7 @@ boilerplate project using yew + actix-web + graphql + mongodb
 * [yew](https://yew.rs/) - yew 是一个设计先进的 Rust 框架，目的是使用 WebAssembly 来创建多线程的前端 web 应用。
 * [tokio](https://tokio.rs/) - tokio 是 Rust 中的异步编程框架，它将复杂的异步编程抽象为 Futures、Tasks 和 Executor，并提供了 Timer 等基础设施。
 * [wasm-pack](https://github.com/rustwasm/wasm-pack) - wasm-pack 是 Rust-Wasm 官方工作组开发，用于构建wasm应用程序的工具。
-* [reqwest](https://docs.rs/reqwest/) - reqwest 是一个简单的 Rust HTTP 客户端，reqwest的async使用的是Tokio的，所以要同时加入Tokio的依赖。
+* [reqwasm](https://docs.rs/reqwasm/0.5.0/reqwasm/) - reqwasm 是一个简单的 Rust HTTP 客户端，它内部提供的所有http request方法都来自[gloo-net](https://docs.rs/gloo-net/0.1.0/gloo_net/)
 
 ### 后端
 * [actix-web](https://actix.rs/) - actix-web 是采用 Rust 开发的一个 Web 框架。它强大快速切于实际，是采用 Rust 进行 Web 开发的最佳选择。
@@ -65,7 +65,16 @@ cargo install trunk
 
 cd client && trunk serve
 ```
-visit http://localhost:3000/
+visit http://127.0.0.1:3000/ 
+
+__* <code> don't replace host 127.0.0.1 by localhost </code>__
+
+if you want to start serve with specific port, by executing below cmd 
+
+```
+trunk serve --port=xxx  --proxy-backend=http://127.0.0.0:8080/api
+```
+
 
 
 ## Referrence Links
