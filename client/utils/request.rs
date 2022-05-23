@@ -1,6 +1,7 @@
 use dotenv_codegen::dotenv;
 use serde::{de::DeserializeOwned, Serialize};
 use crate::types::{ErrorInfo, Error};
+use serde_json::{from_str, Value};
 
 const API_PROXY: &str = dotenv!("BASE_PROXY");
 // const API_PROXY: &str = "http://localhost:8080/api";
@@ -24,12 +25,21 @@ where
 
     let response = builder.send().await;
 
+
     if let Ok(data) = response {
         if data.ok() {
+            log::info!("get_all data {:#?}", &data);
+            // let raw_data = data.text().await.unwrap();
+            // log::info!("get_all raw_data {:#?}", &raw_data);
+            // let _json = data.json().await;
+            // log::info!("get_all _json {:#?}", &_json);
             let data: Result<T, _> = data.json::<T>().await;
+            // let data: Result<T, _> = data.json::<T>().await;
             if let Ok(data) = data {
+                log::info!("ok --- {:#?}", data);
                 Ok(data)
             } else {
+                log::info!("error --- {:#?}", data);
                 Err(Error::DeserializeError)
             }
         } else {

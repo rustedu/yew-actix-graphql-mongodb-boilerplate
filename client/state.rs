@@ -1,5 +1,6 @@
 use serde_derive::{Deserialize, Serialize};
 use strum_macros::{Display, EnumIter};
+use async_graphql::*;
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct State {
@@ -110,7 +111,7 @@ impl State {
     }
 }
 
-#[derive(Serialize, Deserialize, Clone, Debug, PartialEq)]
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, InputObject)]
 #[serde(rename_all = "camelCase")]
 pub struct Entry {
     pub id: u32,
