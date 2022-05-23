@@ -1,4 +1,6 @@
 use serde::{Deserialize, Serialize};
+use async_graphql::*;
+
 
 pub use crate::state::{Entry as TodoInfo};
 
@@ -8,7 +10,7 @@ pub struct TodoInfoWrapper {
     pub todo: TodoInfo,
 }
 
-#[derive(Serialize, Deserialize, Clone, Debug)]
+#[derive(Serialize, Deserialize, Clone, Debug, InputObject)]
 #[serde(rename_all = "camelCase")]
 pub struct TodoListInfo {
     pub todos: Vec<TodoInfo>,
@@ -26,3 +28,4 @@ pub struct TodoCreateUpdateInfo {
 pub struct TodoCreateUpdateInfoWrapper {
     pub todo: TodoCreateUpdateInfo,
 }
+
