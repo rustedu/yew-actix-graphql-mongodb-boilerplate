@@ -1,0 +1,3 @@
+mutation SetTodos($data: AllTodoList!) {
+    setTodos(data: $data)
+}

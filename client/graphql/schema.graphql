@@ -1,0 +1,40 @@
+schema {
+  query: QueryRoot
+  mutation: MutationRoot
+}
+
+directive @ifdef on FIELD
+
+
+type MutationRoot {
+  setTodos(data: AllTodoList!): String!
+}
+
+input AllTodoList {
+  todos: [new_todo!]!
+}
+
+type QueryRoot {
+  getTodos: AllTodos!
+}
+
+type AllTodos {
+  todos: [Todo!]!
+}
+
+type Todo {
+  id: Int!
+  description: String!
+  completed: Boolean!
+  editing: Boolean!
+}
+
+input new_todo {
+  id: Int!
+  description: String!
+  completed: Boolean!
+  editing: Boolean!
+}
+
+
+
